@@ -1,0 +1,17 @@
+{
+    "name": "lilhorse/easypush",
+    "description": "A package for push messages",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "LilHorse",
+            "email": "lilhorse.me@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Loopeer\\EasyPush\\": "src/"
+        }
+    }
+}
