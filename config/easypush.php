@@ -18,6 +18,9 @@ return [
     ],
 
     'xiaomi' => [
-
+        'app_id' => env('XM_APP_ID'),
+        'app_key' => env('XM_APP_KEY'),
+        'app_secret' => env('XM_APP_SECRET'),
+        'app_package' => env('XM_APP_PACKAGE'),
     ],
 ];

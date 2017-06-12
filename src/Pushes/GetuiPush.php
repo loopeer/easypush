@@ -15,6 +15,7 @@ use IGtListMessage;
 use IGtNotificationTemplate;
 use IGtSingleMessage;
 use IGtTarget;
+use Loopeer\EasyPush\Services\Helpers;
 use Loopeer\QuickCms\Services\Utils\LogUtil;
 use RequestException;
 
@@ -40,13 +41,10 @@ class GetuiPush
     /**
      * 对单个用户推送消息
      * @param $clientId
-     * @param $title
-     * @param $text
-     * @param string $transmissionContent
+     * @param $template
      */
-    public function pushMessageToSingle($clientId, $title, $text, $transmissionContent = '')
+    public function pushMessageToSingle($clientId, $template)
     {
-        $template = $this->setIGtNotificationTemplate($title, $text, $transmissionContent);
         $message = new IGtSingleMessage();
         if (config('easypush.getui.is_offline')) {
             $message->set_isOffline(true);//是否离线
@@ -61,25 +59,22 @@ class GetuiPush
 
         try {
             $resp = $this->igt->pushMessageToSingle($message, $target);
-            $this->printResult($resp);
+            Helpers::printResult($resp);
         } catch (RequestException $e){
             $requestId = $e->getRequestId();
             //失败时重发
             $resp = $this->igt->pushMessageToSingle($message, $target, $requestId);
-            $this->printResult($resp);
+            Helpers::printResult($resp);
         }
     }
 
     /**
      * 对指定列表用户推送消息
      * @param $clientIds
-     * @param $title
-     * @param $text
-     * @param string $transmissionContent
+     * @param $template
      */
-    public function pushMessageToList($clientIds, $title, $text, $transmissionContent = '')
+    public function pushMessageToList($clientIds, $template)
     {
-        $template = $this->setIGtNotificationTemplate($title, $text, $transmissionContent);
         //定义"ListMessage"信息体
         $message = new IGtListMessage();
         if (config('easypush.getui.is_offline')) {
@@ -95,18 +90,16 @@ class GetuiPush
             return $target;
         })->toArray();
         $resp = $this->igt->pushMessageToList($contentId, $targetList);
-        $this->printResult($resp);
+        Helpers::printResult($resp);
     }
+
 
     /**
      * 对所有用户推送消息
-     * @param $title
-     * @param $text
-     * @param string $transmissionContent
+     * @param $template
      */
-    public function pushMessageToAll($title, $text, $transmissionContent = '')
+    public function pushMessageToAll($template)
     {
-        $template = $this->setIGtNotificationTemplate($title, $text, $transmissionContent);
         $message = new IGtAppMessage();
         if (config('easypush.getui.is_offline')) {
             $message->set_isOffline(true);//是否离线
@@ -116,10 +109,16 @@ class GetuiPush
         $appIdList = array($this->appId);
         $message->set_appIdList($appIdList);
         $resp = $this->igt->pushMessageToApp($message);
-        $this->printResult($resp);
+        Helpers::printResult($resp);
     }
 
-    protected function setIGtNotificationTemplate($title, $text, $transmissionContent = '')
+    public function getTemplate($title, $content, $transmissionContent = '')
+    {
+        $template = $this->setIGtNotificationTemplate($title, $content, $transmissionContent);
+        return $template;
+    }
+
+    protected function setIGtNotificationTemplate($title, $content, $transmissionContent = '')
     {
         $template =  new IGtNotificationTemplate();
         $template ->set_appId($this->appId);                      //应用appid
@@ -127,20 +126,10 @@ class GetuiPush
         $template->set_transmissionType(1);            //透传消息类型
         $template->set_transmissionContent($transmissionContent);//透传内容
         $template->set_title($title);                  //通知栏标题
-        $template->set_text($text);     //通知栏内容
+        $template->set_text($content);     //通知栏内容
         $template->set_logo('');                       //通知栏logo
         $template->set_logoURL('');                    //通知栏logo链接
 
         return $template;
-    }
-
-    /**
-     * 打印推送结果
-     * @param $platform
-     * @param $result
-     */
-    private function printResult($result) {
-        $logger = LogUtil::getLogger('easypush', 'easypush');
-        $logger->addInfo('result = ' . $result);
     }
 }
