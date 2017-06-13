@@ -9,15 +9,19 @@
 namespace Loopeer\EasyPush\Pushes;
 
 
+use DictionaryAlertMsg;
 use IGeTui;
+use IGtAPNPayload;
 use IGtAppMessage;
 use IGtListMessage;
 use IGtNotificationTemplate;
 use IGtSingleMessage;
 use IGtTarget;
+use IGtTransmissionTemplate;
 use Loopeer\EasyPush\Services\Helpers;
 use Loopeer\QuickCms\Services\Utils\LogUtil;
 use RequestException;
+use SimpleAlertMsg;
 
 class GetuiPush
 {
@@ -112,9 +116,13 @@ class GetuiPush
         Helpers::printResult($resp);
     }
 
-    public function getTemplate($title, $content, $transmissionContent = '')
+    public function getTemplate($title, $content, $transmissionContent = '', $platform = 'android')
     {
-        $template = $this->setIGtNotificationTemplate($title, $content, $transmissionContent);
+        if ($platform == 'ios') {
+            $template = $this->setIGtTransmissionTemplate($title, $content, $transmissionContent);
+        } else {
+            $template = $this->setIGtNotificationTemplate($title, $content, $transmissionContent);
+        }
         return $template;
     }
 
@@ -123,12 +131,28 @@ class GetuiPush
         $template =  new IGtNotificationTemplate();
         $template ->set_appId($this->appId);                      //应用appid
         $template ->set_appkey($this->appKey);                    //应用appkey
-        $template->set_transmissionType(1);            //透传消息类型
+        $template->set_transmissionType(2);            //透传消息类型
         $template->set_transmissionContent($transmissionContent);//透传内容
         $template->set_title($title);                  //通知栏标题
         $template->set_text($content);     //通知栏内容
         $template->set_logo('');                       //通知栏logo
         $template->set_logoURL('');                    //通知栏logo链接
+
+        return $template;
+    }
+
+    protected function setIGtTransmissionTemplate($title, $content, $transmissionContent = '')
+    {
+        $template =  new IGtTransmissionTemplate();
+        $template ->set_appId($this->appId);                      //应用appid
+        $template ->set_appkey($this->appKey);                    //应用appkey
+        $template->set_transmissionContent($transmissionContent);//透传内容
+        $apn = new IGtAPNPayload();
+        $alertMsg = new DictionaryAlertMsg();
+        $alertMsg->title = $title;
+        $alertMsg->body = $content;
+        $apn->alertMsg = $alertMsg;
+        $template->set_apnInfo($apn);
 
         return $template;
     }
