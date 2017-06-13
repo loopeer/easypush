@@ -1,5 +1,5 @@
 {
-    "name": "lilhorse/easypush",
+    "name": "loopeer/easypush",
     "description": "A package for push messages",
     "type": "composer-plugin",
     "license": "MIT",
