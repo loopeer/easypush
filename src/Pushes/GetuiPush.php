@@ -63,12 +63,12 @@ class GetuiPush
 
         try {
             $resp = $this->igt->pushMessageToSingle($message, $target);
-            Helpers::printResult($resp);
+            Helpers::printResult($resp, 'gt');
         } catch (RequestException $e){
             $requestId = $e->getRequestId();
             //失败时重发
             $resp = $this->igt->pushMessageToSingle($message, $target, $requestId);
-            Helpers::printResult($resp);
+            Helpers::printResult($resp, 'gt');
         }
     }
 
@@ -94,7 +94,7 @@ class GetuiPush
             return $target;
         })->toArray();
         $resp = $this->igt->pushMessageToList($contentId, $targetList);
-        Helpers::printResult($resp);
+        Helpers::printResult($resp, 'gt');
     }
 
 
@@ -113,7 +113,7 @@ class GetuiPush
         $appIdList = array($this->appId);
         $message->set_appIdList($appIdList);
         $resp = $this->igt->pushMessageToApp($message);
-        Helpers::printResult($resp);
+        Helpers::printResult($resp, 'gt');
     }
 
     public function getTemplate($title, $content, $transmissionContent = '', $platform = 'android')

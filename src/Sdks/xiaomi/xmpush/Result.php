@@ -9,8 +9,8 @@
 namespace xmpush;
 
 class Result {
-    private $errorCode;
-    private $raw;
+    public $errorCode;
+    public $raw;
 
     public function __construct($jsonStr) {
         $data = json_decode($jsonStr, true);

@@ -29,27 +29,28 @@ class XiaomiPush
         $this->appPackage = config('easypush.xiaomi.app_package');
         Constants::setSecret($this->appSecret);
         Constants::setPackage($this->appPackage);
+        Constants::useOfficial();
     }
 
     public function pushMessageToSingle($clientId, $message)
     {
         $sender = new Sender();
         $result = $sender->send($message, $clientId);
-        Helpers::printResult($result);
+        Helpers::printResult($result, 'xm');
     }
 
     public function pushMessageToList($clientIds, $message)
     {
         $sender = new Sender();
         $result = $sender->sendToIds($message, $clientIds);
-        Helpers::printResult($result);
+        Helpers::printResult($result, 'xm');
     }
 
     public function pushMessageToAll($message)
     {
         $sender = new Sender();
         $result = $sender->broadcastAll($message);
-        Helpers::printResult($result);
+        Helpers::printResult($result, 'xm');
     }
 
     public function getMessage($title, $content, $payload = '', $notifyId = null)
