@@ -66,8 +66,8 @@ class XiaomiPush
         $message->description($content);//内容
         $message->passThrough(0);//0=通知栏消息 1=透传
         $message->payload($payload); // 对于预定义点击行为，payload会通过点击进入的界面的intent中的extra字段获取，而不会调用到onReceiveMessage方法。
-        $message->extra(Builder::notifyEffect, 1); // 此处设置预定义点击行为，1为打开app
-        $message->extra(Builder::notifyForeground,1);
+//        $message->extra(Builder::notifyEffect, 1); // 此处设置预定义点击行为，1为打开app
+//        $message->extra(Builder::notifyForeground,1);
         if (is_null($notifyId)) {
             $message->notifyId(microtime(true) * 10000);
         } else {
