@@ -32,6 +32,8 @@ class GetuiPush
     protected $appSecret;
     protected $masterSecret;
     protected $igt;
+    protected $transmissionType;
+    protected $transmissionContent;
 
     public function __construct()
     {
@@ -116,23 +118,41 @@ class GetuiPush
         Helpers::printResult($resp, 'gt');
     }
 
-    public function getTemplate($title, $content, $transmissionContent = '', $platform = 'android')
+    /**
+     * 设置透传方式
+     * @param int $type
+     */
+    public function setTransmissionType($type = 1)
     {
-        if ($platform == 'ios') {
-            $template = $this->setIGtTransmissionTemplate($title, $content, $transmissionContent);
-        } else {
-            $template = $this->setIGtNotificationTemplate($title, $content, $transmissionContent);
-        }
-        return $template;
+        $this->transmissionType = $type;
     }
 
-    protected function setIGtNotificationTemplate($title, $content, $transmissionContent = '')
+    /**
+     * 设置透传内容
+     * @param array $content
+     */
+    public function setTransmissionContent($content = [])
+    {
+        $this->transmissionContent = $content;
+    }
+
+    /**
+     * 设置通知模板
+     * @param $title
+     * @param $content
+     * @return IGtNotificationTemplate
+     */
+    public function setIGtNotificationTemplate($title, $content)
     {
         $template =  new IGtNotificationTemplate();
         $template ->set_appId($this->appId);                      //应用appid
         $template ->set_appkey($this->appKey);                    //应用appkey
-        $template->set_transmissionType(2);            //透传消息类型
-        $template->set_transmissionContent($transmissionContent);//透传内容
+        if (!empty($this->transmissionType)) {
+            $template->set_transmissionType($this->transmissionType);            //透传消息类型
+        }
+        if (!empty($this->transmissionContent)) {
+            $template->set_transmissionContent(json_encode($this->transmissionContent));//透传内容
+        }
         $template->set_title($title);                  //通知栏标题
         $template->set_text($content);     //通知栏内容
         $template->set_logo('');                       //通知栏logo
@@ -141,18 +161,39 @@ class GetuiPush
         return $template;
     }
 
-    protected function setIGtTransmissionTemplate($title, $content, $transmissionContent = '')
+    /**
+     * 设置透传模板
+     * @param $title
+     * @param $content
+     * @param string $platform
+     * @return IGtTransmissionTemplate
+     */
+    public function setIGtTransmissionTemplate($title, $content, $platform = 'android')
     {
         $template =  new IGtTransmissionTemplate();
         $template ->set_appId($this->appId);                      //应用appid
         $template ->set_appkey($this->appKey);                    //应用appkey
-        $template->set_transmissionContent($transmissionContent);//透传内容
-        $apn = new IGtAPNPayload();
-        $alertMsg = new DictionaryAlertMsg();
-        $alertMsg->title = $title;
-        $alertMsg->body = $content;
-        $apn->alertMsg = $alertMsg;
-        $template->set_apnInfo($apn);
+        if (!empty($this->transmissionType)) {
+            $template->set_transmissionType($this->transmissionType);            //透传消息类型
+        }
+        $defaultContent = ['title' => $title, 'body' => $content];
+        $transmissionContent = $defaultContent;
+        if (!empty($this->transmissionContent)) {
+            foreach ($this->transmissionContent as $key => $value) {
+                $transmissionContent[$key] = $value;
+            }
+        }
+        $template->set_transmissionContent(json_encode($transmissionContent));//透传内容
+
+        if ($platform == 'ios') {
+            $apn = new IGtAPNPayload();
+            $alertMsg = new DictionaryAlertMsg();
+            $alertMsg->title = $title;
+            $alertMsg->body = $content;
+            $apn->alertMsg = $alertMsg;
+            $apn->add_customMsg('payload', json_encode($this->transmissionContent));
+            $template->set_apnInfo($apn);
+        }
 
         return $template;
     }
