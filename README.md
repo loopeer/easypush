@@ -1,14 +1,18 @@
 # EasyPush
 
+## Installation
+  
+  ```shell
+  composer require loopeer/easypush
+  ```
+
 ## Configuration
 1. 注册 `ServiceProvider`和`Facade`:
  
   ```php
   Loopeer\EasyPush\Providers\EasyPushProvider::class,
-  ```
   
-  ```php
-   'EasyPush' => \Loopeer\EasyPush\Facades\EasyPushFacade::class,
+ 'EasyPush' => \Loopeer\EasyPush\Facades\EasyPushFacade::class,
   ```
 
 2. 发布配置文件  
@@ -42,7 +46,7 @@ app('easypush')->pushToAll($title, $content, $custom);
 EasyPush::pushToAll($title, $content, $custom);
 ```
 
-## 参数说明
+## Parameters
 * push: 推送参数，格式为对象或数组
     * channel: 所属渠道（0-个推, 1-小米）
     * client_id: 推送渠道用户id
