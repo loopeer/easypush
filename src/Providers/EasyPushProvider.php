@@ -3,6 +3,7 @@
 namespace Loopeer\EasyPush\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Loopeer\EasyPush\Controllers\EasyPushController as EasyPush;
 
 class EasyPushProvider extends ServiceProvider
 {
@@ -27,6 +28,9 @@ class EasyPushProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(EasyPush::class, function(){
+            return new EasyPush();
+        });
+        $this->app->alias(EasyPush::class, 'easypush');
     }
 }

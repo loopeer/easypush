@@ -2,8 +2,6 @@
 
 namespace Loopeer\EasyPush\Services;
 
-use Loopeer\QuickCms\Services\Utils\LogUtil;
-
 /**
  * 帮助模块
  * Class Helpers
