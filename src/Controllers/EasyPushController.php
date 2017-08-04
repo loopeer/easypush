@@ -99,7 +99,7 @@ class EasyPushController
 
     protected function setXiaomiMessage($title, $content, $custom)
     {
-        $message = $this->xiaomi->getMessage($title, $content, $custom);
+        $message = $this->xiaomi->getMessage($title, $content, json_encode($custom));
         return $message;
     }
 
